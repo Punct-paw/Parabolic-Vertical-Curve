@@ -16,10 +16,6 @@ class VerticalPoint:
     station:float=0.0
     elevation:float=0.0
 
-    def distance_to(self, other:float) -> float:
-        'Calculate the absolute horizontal distance to another station'
-        return abs(self.station-other.station)
-
 @dataclass
 class TVerticalCurve:
     #Data structure for vertical parabolic curve properties
@@ -56,7 +52,7 @@ class VerticalParabolicCurve:
         return self._data.PVI
 
     @PVI.setter
-    def PVI(self, value:VerticalPoint) ->VerticalPoint:
+    def PVI(self, value:VerticalPoint) :
         "Set the PVI and update the curve if possible"
         if value is None:
             raise ValueError("PVI cannot be None")
@@ -70,7 +66,7 @@ class VerticalParabolicCurve:
         return self._data.g1
     
     @g1.setter
-    def g1(self, value:float) ->float:
+    def g1(self, value:float) :
         "Set the incoming grade and update the curve if possible"
         self._data.g1 = value
         if self._data.PVI is not None and self._data.Length>0 and self._data.g2!=0:
@@ -82,7 +78,7 @@ class VerticalParabolicCurve:
         return self._data.g2
     
     @g2.setter
-    def g2(self, value:float) ->float:
+    def g2(self, value:float) :
         "Set the incoming grade and update the curve if possible"
         self._data.g2 = value
         if self._data.PVI is not None and self._data.Length>0 and self._data.g1!=0:
@@ -94,7 +90,7 @@ class VerticalParabolicCurve:
         return self._data.Length
     
     @Length.setter
-    def Length(self, value:float) ->float:
+    def Length(self, value:float): 
         "Set the horizontal length of the curve and update the curve if possible"
         self._data.Length = value
         if self._data.PVI is not None and self._data.g2!=0 and self._data.g1!=0:
@@ -190,7 +186,7 @@ class VerticalParabolicCurve:
 
     def _update_CurveType(self):
         'Determine if the curve is a sag or crest type'
-        a=abs(self._data.g2)-abs(self._data.g1)
+        a=(self._data.g2)-(self._data.g1)
         if a>0 :
             self._data.Curve_type=VerticalCurveType.Sag
         else:
