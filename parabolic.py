@@ -1,7 +1,7 @@
 from enum import Enum
 from dataclasses import dataclass
 from typing import Optional
-
+import logging
 class VerticalCurveType(Enum):
     "Enum for determining whether the curve is sag or crest"
     Sag=0
@@ -15,6 +15,10 @@ class VerticalPoint:
     "Represent a point in a vertical profile with station and elevation"
     station:float=0.0
     elevation:float=0.0
+
+    def distance_to(self, other:float) -> float:
+        'Calculate the absolute horizontal distance to another station'
+        return abs(self.station-other.station)
 
 @dataclass
 class TVerticalCurve:
@@ -52,7 +56,7 @@ class VerticalParabolicCurve:
         return self._data.PVI
 
     @PVI.setter
-    def PVI(self, value:VerticalPoint) :
+    def PVI(self, value:VerticalPoint) ->VerticalPoint:
         "Set the PVI and update the curve if possible"
         if value is None:
             raise ValueError("PVI cannot be None")
@@ -66,7 +70,7 @@ class VerticalParabolicCurve:
         return self._data.g1
     
     @g1.setter
-    def g1(self, value:float) :
+    def g1(self, value:float) ->float:
         "Set the incoming grade and update the curve if possible"
         self._data.g1 = value
         if self._data.PVI is not None and self._data.Length>0 and self._data.g2!=0:
@@ -78,7 +82,7 @@ class VerticalParabolicCurve:
         return self._data.g2
     
     @g2.setter
-    def g2(self, value:float) :
+    def g2(self, value:float) ->float:
         "Set the incoming grade and update the curve if possible"
         self._data.g2 = value
         if self._data.PVI is not None and self._data.Length>0 and self._data.g1!=0:
@@ -90,7 +94,7 @@ class VerticalParabolicCurve:
         return self._data.Length
     
     @Length.setter
-    def Length(self, value:float): 
+    def Length(self, value:float) ->float:
         "Set the horizontal length of the curve and update the curve if possible"
         self._data.Length = value
         if self._data.PVI is not None and self._data.g2!=0 and self._data.g1!=0:
@@ -111,17 +115,19 @@ class VerticalParabolicCurve:
         if not self._data.is_initialized:
             raise ValueError("Curve not initialized")
         if station< self._data.PVC.station or station> self._data.PVT.station:
-            raise ValueError("Station must be within the curve length")
-        
-        return (self._data.g2-self._data.g1)/(2*self._data.Length)*(station-self._data.PVC.station)**2+self._data.g1*(station-self._data.PVC.station)+self._data.PVC.elevation
-    
+           logging.warning("Station must be within the curve length")
+           return None
+        else:
+            return (self._data.g2-self._data.g1)/(2*self._data.Length)*(station-self._data.PVC.station)**2+self._data.g1*(station-self._data.PVC.station)+self._data.PVC.elevation
+
+
     def slope_at(self,station:float) ->float:
         'Calculate the elevation at a given station along the curve'
         if not self._data.is_initialized:
             raise ValueError("Curve not initialized")
         if station< self._data.PVC.station or station> self._data.PVT.station:
-            raise ValueError("Station must be within the curve length")
-        
+            logging.warning("Station must be within the curve length")
+            return None
         return (self._data.g2-self._data.g1)/(self._data.Length)*(station-self._data.PVC.station)+self._data.g1
 
 
@@ -186,7 +192,7 @@ class VerticalParabolicCurve:
 
     def _update_CurveType(self):
         'Determine if the curve is a sag or crest type'
-        a=(self._data.g2)-(self._data.g1)
+        a=self._data.g2-self._data.g1
         if a>0 :
             self._data.Curve_type=VerticalCurveType.Sag
         else:
