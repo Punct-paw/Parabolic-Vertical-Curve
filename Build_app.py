@@ -14,6 +14,7 @@ def build_app():
             "--windowed",  # Run as a GUI application (no console on Windows)
             "--name=VerticalParabolicCurveCalculator",  # Name of the executable
             "--add-data=parabolic.py;.",  # Include parabolic.py (syntax for Windows; use : for macOS/Linux)
+            "--clean"   #Clear cache for fresh build
             "GUIFile.py"  # Main script
         ]
 
