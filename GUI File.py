@@ -202,9 +202,9 @@ class VerticalCurveGUI(QMainWindow):
             distance = self.curve.distance_to_High_low_point()
             self.distance_label.setText(f"Distance to High/Low: {distance:.2f}" if distance is not None else "Distance to High/Low: None")
             calc_elevation = self.curve.elevation_at(calc_station)
-            calc_slope = self.curve.slope_at(calc_station) * 100  # Convert to percentage
-            self.elevation_label.setText(f"Elevation at Station: {calc_elevation:.2f}")
-            self.slope_label.setText(f"Slope at Station: {calc_slope:.2f}%")
+            calc_slope = self.curve.slope_at(calc_station) 
+            self.elevation_label.setText(f"Elevation at Station {calc_station:.2f}: {calc_elevation:.2f}" if calc_elevation is not None else f"Elevation at Station {calc_station:.2f}: Invalid station")
+            self.slope_label.setText(f"Slope at Station {calc_station:.2f}: {calc_slope*100:.2f}%" if calc_slope is not None else f"Slope at Station {calc_station:.2f}: Invalid station")
             self.canvas.calc_station = calc_station
             self.canvas.calc_elevation = calc_elevation
             self.canvas.update()
